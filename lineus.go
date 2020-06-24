@@ -18,7 +18,7 @@ func NewClient(conn io.ReadWriteCloser) *Client {
 }
 
 func (c *Client) LinearInterpolation(x float64, y float64, z float64) (response, error) {
-	_, err := c.conn.Write(
+	return c.send(
 		[]byte(
 			"G01" +
 				" X" + strconv.FormatFloat(x, 'f', 4, 64) +
@@ -27,11 +27,15 @@ func (c *Client) LinearInterpolation(x float64, y float64, z float64) (response,
 				"\u0000",
 		),
 	)
+}
+
+func (c *Client) send(buf []byte) (response, error) {
+	_, err := c.conn.Write(buf)
 	if err != nil {
 		return response{}, err
 	}
 
-	result, err := c.Read()
+	result, err := c.read()
 	if err != nil {
 		return response{}, err
 	}
@@ -41,7 +45,7 @@ func (c *Client) LinearInterpolation(x float64, y float64, z float64) (response,
 	return res, nil
 }
 
-func (c *Client) Read() ([]byte, error) {
+func (c *Client) read() ([]byte, error) {
 	var result []byte
 	buf := make([]byte, 1)
 
@@ -62,8 +66,4 @@ func (c *Client) Read() ([]byte, error) {
 	}
 
 	return result, nil
-}
-
-func (c *Client) Close() error {
-	return c.conn.Close()
 }
