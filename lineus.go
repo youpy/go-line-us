@@ -29,6 +29,10 @@ func (c *Client) LinearInterpolation(x float64, y float64, z float64) (response,
 	)
 }
 
+func (c *Client) Home() (response, error) {
+	return c.send([]byte("G28" + "\u0000"))
+}
+
 func (c *Client) send(buf []byte) (response, error) {
 	_, err := c.conn.Write(buf)
 	if err != nil {
