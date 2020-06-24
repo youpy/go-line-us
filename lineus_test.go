@@ -19,7 +19,7 @@ func TestLinearInterpolation(t *testing.T) {
 	}
 
 	expected := "received: G01 X1000.0000 Y1200.0000 Z0.0000"
-	actual := string(response.Message)
+	actual := string(response.Message())
 	if expected != actual {
 		t.Errorf("got \"%v\"\nwant \"%v\"", actual, expected)
 	}
@@ -33,7 +33,7 @@ func TestHome(t *testing.T) {
 	}
 
 	expected := "received: G28"
-	actual := string(response.Message)
+	actual := string(response.Message())
 	if expected != actual {
 		t.Errorf("got \"%v\"\nwant \"%v\"", actual, expected)
 	}

@@ -9,15 +9,19 @@ type Client struct {
 	conn io.ReadWriter
 }
 
-type response struct {
-	Message []byte
+type Response struct {
+	message []byte
+}
+
+func (r Response) Message() []byte {
+	return r.message
 }
 
 func NewClient(conn io.ReadWriter) *Client {
 	return &Client{conn}
 }
 
-func (c *Client) LinearInterpolation(x float64, y float64, z float64) (response, error) {
+func (c *Client) LinearInterpolation(x float64, y float64, z float64) (Response, error) {
 	return c.send(
 		[]byte(
 			"G01" +
@@ -29,22 +33,22 @@ func (c *Client) LinearInterpolation(x float64, y float64, z float64) (response,
 	)
 }
 
-func (c *Client) Home() (response, error) {
+func (c *Client) Home() (Response, error) {
 	return c.send([]byte("G28" + "\u0000"))
 }
 
-func (c *Client) send(buf []byte) (response, error) {
+func (c *Client) send(buf []byte) (Response, error) {
 	_, err := c.conn.Write(buf)
 	if err != nil {
-		return response{}, err
+		return Response{}, err
 	}
 
 	result, err := c.read()
 	if err != nil {
-		return response{}, err
+		return Response{}, err
 	}
 
-	res := response{result}
+	res := Response{result}
 
 	return res, nil
 }
