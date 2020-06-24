@@ -1,36 +1,24 @@
 package lineus
 
 import (
-	"net"
+	"io"
 	"strconv"
 )
 
 type Client struct {
-	conn *net.TCPConn
+	conn io.ReadWriteCloser
 }
 
 type response struct {
 	Message []byte
 }
 
-func NewClient(hostname string) (cli *Client, err error) {
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", hostname)
-	if err != nil {
-		return
-	}
-
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		return
-	}
-
-	cli = &Client{conn}
-
-	return
+func NewClient(conn io.ReadWriteCloser) *Client {
+	return &Client{conn}
 }
 
-func (c *Client) LinearInterpolation(x float64, y float64, z float64) (res response, err error) {
-	_, err = c.conn.Write(
+func (c *Client) LinearInterpolation(x float64, y float64, z float64) (response, error) {
+	_, err := c.conn.Write(
 		[]byte(
 			"G01" +
 				" X" + strconv.FormatFloat(x, 'f', 4, 64) +
@@ -40,20 +28,21 @@ func (c *Client) LinearInterpolation(x float64, y float64, z float64) (res respo
 		),
 	)
 	if err != nil {
-		return
+		return response{}, err
 	}
 
 	result, err := c.Read()
 	if err != nil {
-		return
+		return response{}, err
 	}
 
-	res = response{result}
+	res := response{result}
 
-	return
+	return res, nil
 }
 
-func (c *Client) Read() (result []byte, err error) {
+func (c *Client) Read() ([]byte, error) {
+	var result []byte
 	buf := make([]byte, 1)
 
 	for {
@@ -72,5 +61,9 @@ func (c *Client) Read() (result []byte, err error) {
 		result = append(result, buf[0])
 	}
 
-	return
+	return result, nil
+}
+
+func (c *Client) Close() error {
+	return c.conn.Close()
 }
