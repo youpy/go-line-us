@@ -6,14 +6,14 @@ import (
 )
 
 type Client struct {
-	conn io.ReadWriteCloser
+	conn io.ReadWriter
 }
 
 type response struct {
 	Message []byte
 }
 
-func NewClient(conn io.ReadWriteCloser) *Client {
+func NewClient(conn io.ReadWriter) *Client {
 	return &Client{conn}
 }
 

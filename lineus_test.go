@@ -11,10 +11,6 @@ type connection struct {
 	*bytes.Buffer
 }
 
-func (c *connection) Close() error {
-	return nil
-}
-
 func TestLinearInterpolation(t *testing.T) {
 	buffer := bytes.NewBufferString("received: ")
 	conn := &connection{buffer}
