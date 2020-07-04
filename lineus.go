@@ -21,6 +21,18 @@ func NewClient(conn io.ReadWriter) *Client {
 	return &Client{conn}
 }
 
+func (c *Client) RapidPositioning(x float64, y float64, z float64) (Response, error) {
+	return c.send(
+		[]byte(
+			"G00" +
+				" X" + strconv.FormatFloat(x, 'f', 4, 64) +
+				" Y" + strconv.FormatFloat(y, 'f', 4, 64) +
+				" Z" + strconv.FormatFloat(z, 'f', 4, 64) +
+				"\u0000",
+		),
+	)
+}
+
 func (c *Client) LinearInterpolation(x float64, y float64, z float64) (Response, error) {
 	return c.send(
 		[]byte(
@@ -35,6 +47,10 @@ func (c *Client) LinearInterpolation(x float64, y float64, z float64) (Response,
 
 func (c *Client) Home() (Response, error) {
 	return c.send([]byte("G28" + "\u0000"))
+}
+
+func (c *Client) Diagnostics() (Response, error) {
+	return c.send([]byte("M122" + "\u0000"))
 }
 
 func (c *Client) send(buf []byte) (Response, error) {

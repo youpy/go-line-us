@@ -11,6 +11,20 @@ type connection struct {
 	*bytes.Buffer
 }
 
+func TestRapidPositioning(t *testing.T) {
+	client := setupClient(t)
+	response, err := client.RapidPositioning(1000.0, 1200.0, 0.0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := "received: G00 X1000.0000 Y1200.0000 Z0.0000"
+	actual := string(response.Message())
+	if expected != actual {
+		t.Errorf("got \"%v\"\nwant \"%v\"", actual, expected)
+	}
+}
+
 func TestLinearInterpolation(t *testing.T) {
 	client := setupClient(t)
 	response, err := client.LinearInterpolation(1000.0, 1200.0, 0.0)
@@ -33,6 +47,20 @@ func TestHome(t *testing.T) {
 	}
 
 	expected := "received: G28"
+	actual := string(response.Message())
+	if expected != actual {
+		t.Errorf("got \"%v\"\nwant \"%v\"", actual, expected)
+	}
+}
+
+func TestDiagnostics(t *testing.T) {
+	client := setupClient(t)
+	response, err := client.Diagnostics()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := "received: M122"
 	actual := string(response.Message())
 	if expected != actual {
 		t.Errorf("got \"%v\"\nwant \"%v\"", actual, expected)
